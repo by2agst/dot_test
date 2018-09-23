@@ -13,10 +13,28 @@ class SearchController extends Controller
 	{
 		try {
 			$req = $request->only('id');
-			if (@$req['id']) {
-				$response = Province::find($req['id']);
+			if (env('data_from') == 'rajaongkir') {
+				$qs      = @$req['id'] ? '?'. http_build_query($req) : '';
+				$url     = 'https://api.rajaongkir.com/starter/province'.$qs;
+				$headers = ['cache-control: no-cache', 'key: '.env('app_ro_key')];
+				$curl    = custom_curl($url, $headers);
+
+				if($curl['error']){
+					throw $curl['error'];
+				}
+
+				$response = json_decode($curl['response']);
+				if(@$response->rajaongkir->status->code !== 200) {
+					throw new Exception('failed');
+				}
+
+				$response = $response->rajaongkir->results;
 			} else {
-				$response = Province::get();
+				if (@$req['id']) {
+					$response = Province::find($req['id']);
+				} else {
+					$response = Province::get();
+				}
 			}
 
 			if (!$response) {
@@ -34,10 +52,28 @@ class SearchController extends Controller
 	{
 		try {
 			$req = $request->only('id');
-			if (@$req['id']) {
-				$response = City::find($req['id']);
+			if (env('data_from') == 'rajaongkir') {
+				$qs      = @$req['id'] ? '?'. http_build_query($req) : '';
+				$url     = 'https://api.rajaongkir.com/starter/cities'.$qs;
+				$headers = ['cache-control: no-cache', 'key: '.env('app_ro_key')];
+				$curl    = custom_curl($url, $headers);
+
+				if($curl['error']){
+					throw $curl['error'];
+				}
+
+				$response = json_decode($curl['response']);
+				if(@$response->rajaongkir->status->code !== 200) {
+					throw new Exception('failed');
+				}
+
+				$response = $response->rajaongkir->results;
 			} else {
-				$response = City::get();
+				if (@$req['id']) {
+					$response = City::find($req['id']);
+				} else {
+					$response = City::get();
+				}
 			}
 
 			if (!$response) {

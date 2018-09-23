@@ -15,5 +15,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('search/provinces', 'SearchController@provinces')->name('search/provinces');
-Route::get('search/cities', 'SearchController@cities')->name('search/cities');
+Route::post('register', 'AuthController@register');
+Route::post('login', 'AuthController@login');
+Route::post('recover', 'AuthController@recover');
+Route::group(['middleware' => ['jwt.auth']], function() {
+    Route::get('logout', 'AuthController@logout');
+	Route::get('search/provinces', 'SearchController@provinces')->name('search/provinces');
+	Route::get('search/cities', 'SearchController@cities')->name('search/cities');
+});
+Route::get('user/verify/{verification_code}', 'AuthController@verifyUser');
+Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.request');
+Route::post('password/reset', 'Auth\ResetPasswordController@postReset')->name('password.reset');
